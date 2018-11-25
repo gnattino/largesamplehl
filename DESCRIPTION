@@ -1,11 +1,17 @@
-Package: largesamplehl
+Package: polymatching
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A Modification of the Hosmer-Lemeshow Test for Large Samples
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(
+    person("Giovanni", "Nattino", email = "nattino.1@osu.edu", role = c("aut", "cre")),
+    person("Michael", "Pennell", role = "aut"),
+    person("Stanley", "Lemeshow", role = "aut"))
+Description: Includes functions implenting a statistical test to 
+    assess the goodness of fit of logistic regression models in large samples. 
+License: GPL-3
 Encoding: UTF-8
-LazyData: true
+LazyData: TRUE
+Imports: stats
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.1.1
