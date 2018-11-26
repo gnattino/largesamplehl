@@ -1,14 +1,31 @@
-#Auziliary function to estimate the standardized noncentrality parameter
-b <- function(sqrtLambda, dof, alpha) {
-  return(uniroot(f = function(x) {
-    (pchisq((sqrtLambda + x)^2, df = dof, ncp = sqrtLambda^2 ) -
-       pchisq((max(c(sqrtLambda - x,0)))^2, df = dof, ncp = sqrtLambda^2)) - (1-alpha)
-  }, lower = 0, upper = 10 * qchisq(1-alpha/2, df = dof, ncp = sqrtLambda^2))$root)
+#' Compute Hosmer-Lemeshow Statistic
+#' @keywords internal
+hlstat <- function(y, prob, G) {
+
+  cutresult <- cut(prob, breaks = quantile(prob, probs = seq(0, 1, 1/G)),
+                   include.lowest=TRUE)
+
+  obs <- xtabs(cbind(1-y, y) ~ cutresult)
+  exp <- xtabs(cbind(1-prob, prob) ~ cutresult)
+
+  output <- sum((obs-exp)^2/exp)
+
+  return(output)
 }
 
-#Estimate the standardized noncentrality parameter, its confidence interval and
-# compute the p-value of the proposed test
-stdzNcp <- function(cHat, dof, n, alternative, epsilon0, conf.level, cimethod) {
+#' Auxiliary function to estimate the standardized noncentrality parameter
+#' @keywords internal
+b <- function(sqrtLambda, dof, alpha) {
+  return(stats::uniroot(f = function(x) {
+    (stats::pchisq((sqrtLambda + x)^2, df = dof, ncp = sqrtLambda^2 ) -
+       stats::pchisq((max(c(sqrtLambda - x,0)))^2, df = dof, ncp = sqrtLambda^2)) - (1-alpha)
+  }, lower = 0, upper = 10 * stats::qchisq(1-alpha/2, df = dof, ncp = sqrtLambda^2))$root)
+}
+
+#' Estimate the standardized noncentrality parameter,
+#' its confidence interval and compute the p-value of the proposed test
+#' @keywords internal
+stdzNcp <- function(cHat, dof, n, epsilon0, conf.level, citype, cimethod) {
 
   alpha <- 1 - conf.level
 
@@ -21,25 +38,25 @@ stdzNcp <- function(cHat, dof, n, alternative, epsilon0, conf.level, cimethod) {
   if(alternative == "two.sided") {
 
     #CI 1.1: central probability interval (equal tails of nc chi-squared distrib)
-    if(method== "central") {
-      if(cHat < qchisq(1 - alpha/2, df = dof, ncp = 0) ) {
+    if(cimethod== "central") {
+      if(cHat < stats::qchisq(1 - alpha/2, df = dof, ncp = 0) ) {
         lambdaLow_central <- 0
       } else {
-        lambdaLow_central <- uniroot(f = function(x) {
-          qchisq(1 - alpha/2, df = dof, ncp = x) - cHat
+        lambdaLow_central <- stats::uniroot(f = function(x) {
+          stats::qchisq(1 - alpha/2, df = dof, ncp = x) - cHat
         },
         lower = 0,
         upper = cHat)$root
       }
 
-      if(cHat < qchisq(alpha/2, df = dof, ncp = 0)) {
+      if(cHat < stats::qchisq(alpha/2, df = dof, ncp = 0)) {
         lambdaUpp_central <- 0
       } else {
-        lambdaUpp_central <- uniroot(f = function(x) {
-          qchisq(alpha/2, df = dof, ncp = x) - cHat
+        lambdaUpp_central <- stats::uniroot(f = function(x) {
+          stats::qchisq(alpha/2, df = dof, ncp = x) - cHat
         },
         lower = 0,
-        upper = (10*sqrt(cHat) + qnorm(1-alpha/2))^2)$root
+        upper = (10*sqrt(cHat) + stats::qnorm(1-alpha/2))^2)$root
       }
 
       epsilonLow <- sqrt(lambdaLow_central/n)
@@ -48,23 +65,23 @@ stdzNcp <- function(cHat, dof, n, alternative, epsilon0, conf.level, cimethod) {
     }
 
     #CI 1.2: symmetric range interval
-    if(method == "symmetric") {
+    if(cimethod == "symmetric") {
 
-      if(sqrt(cHat) < largesamplehl:::b(0, dof, alpha)) {
+      if(sqrt(cHat) < b(0, dof, alpha)) {
         lambdaLow_symmetric <- 0
       } else {
-        lambdaLow_symmetric <- (uniroot(f = function(x) {
-          x + largesamplehl:::b(x, dof, alpha) - sqrt(cHat)
+        lambdaLow_symmetric <- (stats::uniroot(f = function(x) {
+          x + b(x, dof, alpha) - sqrt(cHat)
         },
         lower = 0,
         upper = sqrt(cHat))$root)^2
       }
 
-      lambdaUpp_symmetric <- (uniroot(f = function(x) {
-        max(c(x - largesamplehl:::b(x, dof, alpha), 0)) - sqrt(cHat)
+      lambdaUpp_symmetric <- (stats::uniroot(f = function(x) {
+        max(c(x - b(x, dof, alpha), 0)) - sqrt(cHat)
       },
       lower = 0,
-      upper = (10*sqrt(cHat) + qnorm(1-alpha/2)))$root)^2
+      upper = (10*sqrt(cHat) + stats::qnorm(1-alpha/2)))$root)^2
 
 
       epsilonLow <- sqrt(lambdaLow_symmetric/n)
@@ -75,14 +92,14 @@ stdzNcp <- function(cHat, dof, n, alternative, epsilon0, conf.level, cimethod) {
   #CI 2: interval ONE-SIDED
   if(alternative == "greater") {
 
-    if(cHat < qchisq(1 - alpha, df = dof, ncp = 0)) {
+    if(cHat < stats::qchisq(1 - alpha, df = dof, ncp = 0)) {
 
       lambdaLow_oneSided <- 0
 
     } else {
 
-      lambdaLow_oneSided <- uniroot(f = function(x) {
-        qchisq(1 - alpha, df = dof, ncp = x) - cHat
+      lambdaLow_oneSided <- stats::uniroot(f = function(x) {
+        stats::qchisq(1 - alpha, df = dof, ncp = x) - cHat
       },
       lower = 0,
       upper = cHat)$root
@@ -94,8 +111,8 @@ stdzNcp <- function(cHat, dof, n, alternative, epsilon0, conf.level, cimethod) {
 
   }
 
-  #p-value (if epsilon0=0, it's the traditional HL test)
-  p.value <- 1 - pchisq(cHat, df = dof, ncp = epsilon0^2 * n)
+  #p-value (if epsilon0=0, traditional HL test)
+  p.value <- 1 - stats::pchisq(cHat, df = dof, ncp = epsilon0^2 * n)
 
   return(list(lambdaHat = lambdaHat,
               epsilonHat = epsilonHat,

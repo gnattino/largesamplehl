@@ -1,5 +1,6 @@
-#Chek inputs
-checkInputs <- function(y, prob, G, outsample, conf.level, alternative, cimethod, epsilon0){
+#' Chek inputs
+#' @keywords internal
+checkInputs <- function(y, prob, G, outsample, epsilon0, conf.level, citype, cimethod){
 
   if( ! "numeric" %in% class(prob) ) {
 
@@ -19,15 +20,15 @@ checkInputs <- function(y, prob, G, outsample, conf.level, alternative, cimethod
   }
 
 
-  if(! alternative %in% c("two.sided", "greater") ) {
-    stop("'alternative' must be either 'two.sided' or 'greater'")
+  if(! citype %in% c("two.sided", "one.sided") ) {
+    stop("'citype' must be either 'two.sided' or 'one.sided'")
   }
-  if(alternative == "two.sided") {
+  if(citype == "two.sided") {
     if(is.null(cimethod)) {
-      stop("When 'alternative' is 'two.sided', 'cimethod' must be 'central' or 'symmetric'")
+      stop("When 'citype' is 'two.sided', 'cimethod' must be 'central' or 'symmetric'")
     }
-    if(! cimethod %in% c("two.sided", "greater")) {
-      stop("When 'alternative' is 'two.sided', 'cimethod' must be 'central' or 'symmetric'")
+    if(! cimethod %in% c("two.sided", "one.sided")) {
+      stop("When 'citype' is 'two.sided', 'cimethod' must be 'central' or 'symmetric'")
     }
   }
 

@@ -1,4 +1,4 @@
-Package: polymatching
+Package: largesamplehl
 Type: Package
 Title: A Modification of the Hosmer-Lemeshow Test for Large Samples
 Version: 0.1.0
