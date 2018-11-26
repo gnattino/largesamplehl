@@ -1,5 +1,4 @@
-#' Auxiliary function to estimate the standardized noncentrality parameter
-#' @keywords internal
+# Auxiliary function to estimate the standardized noncentrality parameter
 b <- function(sqrtLambda, dof, alpha) {
   return(stats::uniroot(f = function(x) {
     (stats::pchisq((sqrtLambda + x)^2, df = dof, ncp = sqrtLambda^2 ) -
@@ -7,9 +6,8 @@ b <- function(sqrtLambda, dof, alpha) {
   }, lower = 0, upper = 10 * stats::qchisq(1-alpha/2, df = dof, ncp = sqrtLambda^2))$root)
 }
 
-#' Estimate the standardized noncentrality parameter,
-#' its confidence interval and compute the p-value of the proposed test
-#' @keywords internal
+# Estimate the standardized noncentrality parameter,
+# its confidence interval and compute the p-value of the proposed test
 stdzNcp <- function(cHat, dof, n, epsilon0, conf.level, citype, cimethod) {
 
   alpha <- 1 - conf.level
@@ -20,7 +18,7 @@ stdzNcp <- function(cHat, dof, n, epsilon0, conf.level, citype, cimethod) {
 
   #Reference for CI: Kent and Hainsworth (1995)
   #CI 1: two-sided CI
-  if(alternative == "two.sided") {
+  if(citype == "two.sided") {
 
     #CI 1.1: central probability interval (equal tails of nc chi-squared distrib)
     if(cimethod== "central") {
@@ -75,7 +73,7 @@ stdzNcp <- function(cHat, dof, n, epsilon0, conf.level, citype, cimethod) {
   }
 
   #CI 2: interval ONE-SIDED
-  if(alternative == "greater") {
+  if(citype == "one.sided") {
 
     if(cHat < stats::qchisq(1 - alpha, df = dof, ncp = 0)) {
 

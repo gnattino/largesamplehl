@@ -22,6 +22,7 @@
 #' @param cimethod Method to be used to compute the two-sided confidence interval:
 #' symmetric (\code{cimethod="symmetric"}, default) or central
 #' (\code{cimethod="central"}). See section "Details" for further information.
+#' @param ... Other arguments.
 #'
 #' @return A list of class \code{htest} containing the following components:
 #' \describe{
@@ -62,20 +63,20 @@
 #'
 #' #Same output with vectors of responses and predicted probabilities
 #' hltest(y=dat$y, prob=dat$phat)
-#' @name hltest
-NULL
-
-#' @rdname hltest
+#'
+#' @export
 hltest <- function(...) {
   UseMethod("hltest")
 }
 
-#' @rdname hltest
+#' @describeIn hltest Method for vectors of responses and predicted probabilities.
+#' @export
 hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
                            epsilon0 = sqrt((stats::qchisq(.95, df = (G-2)) - (G-2))/1e6),
                            conf.level = 0.95,
                            citype = "one.sided",
-                           cimethod = ifelse(citype == "one.sided", NULL, "symmetric")) {
+                           cimethod = ifelse(citype == "one.sided", NULL, "symmetric"),
+                           ...) {
 
   checkInputs(y, prob, G, outsample, epsilon0, conf.level, citype, cimethod)
 
@@ -148,11 +149,13 @@ hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
   return(outputTest)
 }
 
-#' @rdname hltest
+
+#' @describeIn hltest Method for result of \code{glm} fit.
+#' @export
 hltest.glm <- function(glmObject,...) {
 
   #Extract predicted probabilities and response from glmObject
-  prob <- predict(glmObject, type = "response")
+  prob <- stats::predict(glmObject, type = "response")
   y <- glmObject$y
 
   result <- hltest.numeric(y = y, prob = prob, ...)
@@ -160,15 +163,14 @@ hltest.glm <- function(glmObject,...) {
   return(result)
 }
 
-#' Compute Hosmer-Lemeshow Statistic
-#' @keywords internal
+# Compute Hosmer-Lemeshow Statistic
 hlstat <- function(y, prob, G) {
 
-  cutresult <- cut(prob, breaks = quantile(prob, probs = seq(0, 1, 1/G)),
+  cutresult <- cut(prob, breaks = stats::quantile(prob, probs = seq(0, 1, 1/G)),
                    include.lowest=TRUE)
 
-  obs <- xtabs(cbind(1-y, y) ~ cutresult)
-  exp <- xtabs(cbind(1-prob, prob) ~ cutresult)
+  obs <- stats::xtabs(cbind(1-y, y) ~ cutresult)
+  exp <- stats::xtabs(cbind(1-prob, prob) ~ cutresult)
 
   output <- sum((obs-exp)^2/exp)
 
