@@ -22,7 +22,7 @@
 #' @param cimethod Method to be used to compute the two-sided confidence interval:
 #' symmetric (\code{cimethod="symmetric"}, default) or central
 #' (\code{cimethod="central"}). See section "Details" for further information.
-#' @param ... Other arguments.
+#' @param ... Additional (ignored) arguments.
 #'
 #' @return A list of class \code{htest} containing the following components:
 #' \describe{
