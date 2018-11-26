@@ -7,13 +7,17 @@
 #' The vectors must have equal length. Missing values are dropped.
 #' @param glmObject In alternative to the vectors \code{y} and \code{prob}, it is possible to
 #' provide the \code{glm} object with the model to be evaluated.
-#' @param G Number of groups to be used in the Hosmer-Lemeshow statistic.
+#' @param G Number of groups to be used in the Hosmer-Lemeshow statistic. By default, \code{G=10}
 #' @param outsample A boolean specifying whether the model has been fit on the data provided
 #' (\code{outsample=FALSE}, default) or if the model has been developed on an external sample
 #' (\code{outsample=TRUE}). The distribution of the Hosmer-Lemeshow
 #' statistic is assumed to have \code{G-2} and \code{G} degrees of freedom if \code{outsample=FALSE} and
 #' \code{outsample=TRUE}, respectively.
-#' @param epsilon0 Value of the parameter epsilon0 (add details).
+#' @param epsilon0 Value of the parameter epsilon0, which characterizes the models to be considered as
+#' acceptable in terms of goodness of fit. By default, epsilon0 is the value of epsilon expected from a model attaining a
+#' p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations (i.e., epsilon0 = 2.74e-3).
+#' The case \code{epsilon0=0} corresponds to the traditional Hosmer-Lemeshow test. See the section
+#' "Details" for further information.
 #' @param conf.level Confidence level for the confidence interval of epsilon. Equal to \code{.95}
 #' by default.
 #' @param citype Type of confidence interval of epsilon to be computed: one-sided
@@ -22,7 +26,7 @@
 #' @param cimethod Method to be used to compute the two-sided confidence interval:
 #' symmetric (\code{cimethod="symmetric"}, default) or central
 #' (\code{cimethod="central"}). See section "Details" for further information.
-#' @param ... Additional (ignored) arguments.
+#' @param ... Additional arguments (ignored).
 #'
 #' @return A list of class \code{htest} containing the following components:
 #' \describe{
@@ -37,7 +41,38 @@
 #'   \item{conf.int}{The confidence interval of epsilon.}
 #' }
 #'
-#' @details Some details soon.
+#' @details The modification of the Hosmer-Lemeshow test evaluates the hypotheses:
+#'
+#' H0: epsilon <= epsilon0 vs. Ha: epsilon > epsilon0,
+#'
+#' where epsilon is a parameter that measures the goodness of fit of a model. This parameter is based on a
+#' standardization of the noncentrality parameter that characterizes the distribution
+#' of the Hosmer-Lemeshow statistic. The case epsilon=0 corresponds to a model with perfect fit.
+#'
+#' Because the null hypothesis of the traditional Hosmer-Lemeshow test is the condition of perfect fit,
+#' it can be interpreted as a test for H0: epsilon = 0 vs. Ha: epsilon > 0. Therefore, the
+#' traditional Hosmer-Lemeshow test can be performed by setting the argument \code{epsilon0=0}.
+#'
+#' If epsilon0>0, the implemented test evaluates whether the fit of a model is "acceptable", albeit not perfect.
+#' The value of epsilon0 defines what is meant for "acceptable" in terms of goodness of fit.
+#' By default, epsilon0 is the value of epsilon expected from a model attaining a
+#' p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations (i.e., epsilon0 = 2.74e-3).
+#' In other words, the test assesses whether the fit of a model is worse than
+#' the fit of a model that would be considered as borderline-significant (i.e., attaining a p-value of 0.05)
+#' in a sample of one million observations.
+#'
+#' The function also estimates the parameter epsilon and constructs its confidence interval.
+#' The confidence interval of this parameter is based on the confidence interval of the
+#' noncentrality parameter that characterizes the distribution
+#' of the Hosmer-Lemeshow statistic, which is noncentral chi-squared. Two types of
+#' two-sided confidence intervals are implemented: symmetric (default) and central.
+#' See Kent and Hainsworth (1995) for further details.
+#'
+#' References:
+#'
+#' Kent, J. T., & Hainsworth, T. J. (1995). Confidence intervals for the noncentral chi-squared distribution. \textit{Journal of Statistical Planning and Inference}, 46(2), 147–159.
+#'
+#' Nattino, G., Pennell, M. L., & Lemeshow, S.. Assessing the Goodness of fit of Logistic Regression Models in Large Samples: A Modification of the Hosmer-Lemeshow Test. \textit{In preparation}.
 #'
 #' @examples
 #' #Generate fake data with two variables: one continuous and one binary.
