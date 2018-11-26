@@ -1,6 +1,6 @@
 #' Modified Hosmer-Lemeshow Test for Large Samples
 #'
-#' Implements a goodness-of-fit test to assess the goodness of fit of
+#' \code{hltest} implements a goodness-of-fit test to assess the goodness of fit of
 #' logistic regression models in large samples.
 #'
 #' @param y,prob Numeric vectors with binary responses and predicted probabilities to be evaluated.
@@ -36,6 +36,8 @@
 #'   \item{conf.int}{The confidence interval of epsilon.}
 #' }
 #'
+#' @details Some details soon.
+#'
 #' @examples
 #' #Generate fake data with two variables: one continuous and one binary.
 #' set.seed(1234)
@@ -60,16 +62,15 @@
 #'
 #' #Same output with vectors of responses and predicted probabilities
 #' hltest(y=dat$y, prob=dat$phat)
-#'
-#' @name hltestMain
+#' @name hltest
 NULL
 
-#' @rdname hltestMain
+#' @rdname hltest
 hltest <- function(...) {
   UseMethod("hltest")
 }
 
-#' @rdname hltestMain
+#' @rdname hltest
 hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
                            epsilon0 = sqrt((stats::qchisq(.95, df = (G-2)) - (G-2))/1e6),
                            conf.level = 0.95,
@@ -147,7 +148,7 @@ hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
   return(outputTest)
 }
 
-#' @rdname hltestMain
+#' @rdname hltest
 hltest.glm <- function(glmObject,...) {
 
   #Extract predicted probabilities and response from glmObject
@@ -157,5 +158,20 @@ hltest.glm <- function(glmObject,...) {
   result <- hltest.numeric(y = y, prob = prob, ...)
 
   return(result)
+}
+
+#' Compute Hosmer-Lemeshow Statistic
+#' @keywords internal
+hlstat <- function(y, prob, G) {
+
+  cutresult <- cut(prob, breaks = quantile(prob, probs = seq(0, 1, 1/G)),
+                   include.lowest=TRUE)
+
+  obs <- xtabs(cbind(1-y, y) ~ cutresult)
+  exp <- xtabs(cbind(1-prob, prob) ~ cutresult)
+
+  output <- sum((obs-exp)^2/exp)
+
+  return(output)
 }
 

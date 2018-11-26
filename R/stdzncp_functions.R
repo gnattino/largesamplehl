@@ -1,18 +1,3 @@
-#' Compute Hosmer-Lemeshow Statistic
-#' @keywords internal
-hlstat <- function(y, prob, G) {
-
-  cutresult <- cut(prob, breaks = quantile(prob, probs = seq(0, 1, 1/G)),
-                   include.lowest=TRUE)
-
-  obs <- xtabs(cbind(1-y, y) ~ cutresult)
-  exp <- xtabs(cbind(1-prob, prob) ~ cutresult)
-
-  output <- sum((obs-exp)^2/exp)
-
-  return(output)
-}
-
 #' Auxiliary function to estimate the standardized noncentrality parameter
 #' @keywords internal
 b <- function(sqrtLambda, dof, alpha) {

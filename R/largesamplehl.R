@@ -1,8 +1,8 @@
 #' largesamplehl: A Modification of the Hosmer-Lemeshow Test for Large Samples
 #'
-#' Soon 1
+#' Coming soon.
 #'
-#' Soon 2
+#' Look at the main function \code{\link{hltest}}
 #'
 #' @docType package
 #' @name largesamplehl
