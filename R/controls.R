@@ -1,4 +1,4 @@
-# Chek inputs
+# Check inputs
 checkInputs <- function(y, prob, G, outsample, epsilon0, conf.level, citype, cimethod){
 
   if( ! "numeric" %in% class(prob) ) {
