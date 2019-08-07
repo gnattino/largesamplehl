@@ -97,9 +97,9 @@ See Kent and Hainsworth (1995) for further details.
 
 References:
 
-Kent, J. T., & Hainsworth, T. J. (1995). Confidence intervals for the noncentral chi-squared distribution. \textit{Journal of Statistical Planning and Inference}, 46(2), 147–159.
+Kent, J. T., & Hainsworth, T. J. (1995). Confidence intervals for the noncentral chi-squared distribution. Journal of Statistical Planning and Inference, 46(2), 147–159.
 
-Nattino, G., Pennell, M. L., & Lemeshow, S.. Assessing the Goodness of fit of Logistic Regression Models in Large Samples: A Modification of the Hosmer-Lemeshow Test. \textit{In preparation}.
+Nattino, G., Pennell, M. L., & Lemeshow, S.. Assessing the Goodness of fit of Logistic Regression Models in Large Samples: A Modification of the Hosmer-Lemeshow Test. In preparation.
 }
 \section{Methods (by class)}{
 \itemize{
