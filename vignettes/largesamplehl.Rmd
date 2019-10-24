@@ -1,0 +1,17 @@
+---
+title: 'Assessing the Goodness of fit of Logistic Regression Models in Large Samples: A Modification of the Hosmer-Lemeshow Test'
+author: "Giovanni Nattino"
+date: "October 23, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+```{r}
+
+```
+
