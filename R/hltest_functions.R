@@ -14,8 +14,8 @@
 #' statistic is assumed to have \code{G-2} and \code{G} degrees of freedom if \code{outsample=FALSE} and
 #' \code{outsample=TRUE}, respectively.
 #' @param epsilon0 Value of the parameter epsilon0, which characterizes the models to be considered as
-#' acceptable in terms of goodness of fit. By default, epsilon0 is the value of epsilon expected from a model attaining a
-#' p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations (i.e., epsilon0 = 2.74e-3).
+#' acceptable in terms of goodness of fit. By default (NULL), epsilon0 is set to the value of epsilon expected from a model attaining a
+#' p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations.
 #' The case \code{epsilon0=0} corresponds to the traditional Hosmer-Lemeshow test. See the section
 #' "Details" for further information.
 #' @param conf.level Confidence level for the confidence interval of epsilon. Equal to \code{.95}
@@ -56,7 +56,7 @@
 #' If epsilon0>0, the implemented test evaluates whether the fit of a model is "acceptable", albeit not perfect.
 #' The value of epsilon0 defines what is meant for "acceptable" in terms of goodness of fit.
 #' By default, epsilon0 is the value of epsilon expected from a model attaining a
-#' p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations (i.e., epsilon0 = 2.74e-3).
+#' p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations.
 #' In other words, the test assesses whether the fit of a model is worse than
 #' the fit of a model that would be considered as borderline-significant (i.e., attaining a p-value of 0.05)
 #' in a sample of one million observations.
@@ -107,13 +107,18 @@ hltest <- function(...) {
 #' @describeIn hltest Method for vectors of responses and predicted probabilities.
 #' @export
 hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
-                           epsilon0 = sqrt((stats::qchisq(.95, df = (G-2)) - (G-2))/1e6),
+                           epsilon0 = NULL,
                            conf.level = 0.95,
                            citype = "one.sided",
                            cimethod = ifelse(citype == "one.sided", NULL, "symmetric"),
                            ...) {
 
-  checkInputs(y, prob, G, outsample, epsilon0, conf.level, citype, cimethod)
+  resultCheck <- checkInputs(y, prob, G, outsample, epsilon0, conf.level, citype, cimethod)
+
+  epsilon0 <- resultCheck$epsilon0
+  G <- resultCheck$G
+  dof <- resultCheck$dof
+  breaks <- resultCheck$breaks
 
   #Remove missing
   indexesMissing <- (is.na(y) | is.na(prob))
@@ -124,8 +129,7 @@ hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
   n <- length(y)
 
   #Compute HL statistic
-  cHat <- hlstat(y, prob, G)
-  dof <- ifelse(outsample==T, G, G-2)
+  cHat <- hlstat(y, prob, breaks)
 
   resultStdzNcp <- stdzNcp(cHat, dof, n, epsilon0, conf.level, citype, cimethod)
 
@@ -189,8 +193,15 @@ hltest.numeric <- function(y, prob, G=10, outsample=FALSE,
 #' @export
 hltest.glm <- function(glmObject,...) {
 
+  if(glmObject$family$family != "binomial" |
+     glmObject$family$link != "logit") {
+
+    stop("The test only applies to logistic regression models ",
+         "(glm model with family = binomial(link = 'logit'))")
+  }
+
   #Extract predicted probabilities and response from glmObject
-  prob <- stats::predict(glmObject, type = "response")
+  prob <- glmObject$fitted.values
   y <- glmObject$y
 
   result <- hltest.numeric(y = y, prob = prob, ...)
@@ -199,9 +210,9 @@ hltest.glm <- function(glmObject,...) {
 }
 
 # Compute Hosmer-Lemeshow Statistic
-hlstat <- function(y, prob, G) {
+hlstat <- function(y, prob, breaks) {
 
-  cutresult <- cut(prob, breaks = stats::quantile(prob, probs = seq(0, 1, 1/G)),
+  cutresult <- cut(prob, breaks = breaks,
                    include.lowest=TRUE)
 
   obs <- stats::xtabs(cbind(1-y, y) ~ cutresult)

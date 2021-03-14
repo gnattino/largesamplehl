@@ -9,9 +9,8 @@
 hltest(...)
 
 \method{hltest}{numeric}(y, prob, G = 10, outsample = FALSE,
-  epsilon0 = sqrt((stats::qchisq(0.95, df = (G - 2)) - (G - 2))/1e+06),
-  conf.level = 0.95, citype = "one.sided", cimethod = ifelse(citype
-  == "one.sided", NULL, "symmetric"), ...)
+  epsilon0 = NULL, conf.level = 0.95, citype = "one.sided",
+  cimethod = ifelse(citype == "one.sided", NULL, "symmetric"), ...)
 
 \method{hltest}{glm}(glmObject, ...)
 }
@@ -30,8 +29,8 @@ statistic is assumed to have \code{G-2} and \code{G} degrees of freedom if \code
 \code{outsample=TRUE}, respectively.}
 
 \item{epsilon0}{Value of the parameter epsilon0, which characterizes the models to be considered as
-acceptable in terms of goodness of fit. By default, epsilon0 is the value of epsilon expected from a model attaining a
-p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations (i.e., epsilon0 = 2.74e-3).
+acceptable in terms of goodness of fit. By default (NULL), epsilon0 is set to the value of epsilon expected from a model attaining a
+p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations.
 The case \code{epsilon0=0} corresponds to the traditional Hosmer-Lemeshow test. See the section
 "Details" for further information.}
 
@@ -83,7 +82,7 @@ traditional Hosmer-Lemeshow test can be performed by setting the argument \code{
 If epsilon0>0, the implemented test evaluates whether the fit of a model is "acceptable", albeit not perfect.
 The value of epsilon0 defines what is meant for "acceptable" in terms of goodness of fit.
 By default, epsilon0 is the value of epsilon expected from a model attaining a
-p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations (i.e., epsilon0 = 2.74e-3).
+p-value of the traditional Hosmer-Lemeshow test of 0.05 in a sample of one million observations.
 In other words, the test assesses whether the fit of a model is worse than
 the fit of a model that would be considered as borderline-significant (i.e., attaining a p-value of 0.05)
 in a sample of one million observations.

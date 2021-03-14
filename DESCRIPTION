@@ -1,7 +1,7 @@
 Package: largesamplehl
 Type: Package
 Title: A Modification of the Hosmer-Lemeshow Test for Large Samples
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Giovanni", "Nattino", email = "nattino.1@osu.edu", role = c("aut", "cre")),
     person("Michael", "Pennell", role = "aut"),
